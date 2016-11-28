@@ -54,7 +54,7 @@ class SQLConditionBuilder extends Object
   _buildExpressionWithObject:(expr,object)->
     for key,value of object
       if value instanceof Object
-        expr.and(@build(value))
+        expr.and('(' + @build(value) + ')')
       else
         parsedValue = @_parseValue(value)
         if parsedValue
