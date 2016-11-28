@@ -39,4 +39,5 @@ NOTE: in last example ***x*** is ignored because it's pointing to array of value
 * **{a:'>=25'}** –> `a >= '25'`
 * **{a:'<=25'}** –> `a <= '25'`
 * **{a:'[2 TO 200]'}** –> `a BETWEEN '2' AND '200'`
+* **{a:'[1,2,3,aa]'}** –> `a IN ('1','2','3','aa')`
 * **{a:'He?lo wor\*'}** –> `a LIKE 'He_lo wor%'`

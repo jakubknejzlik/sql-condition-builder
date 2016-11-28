@@ -64,6 +64,15 @@
           return "BETWEEN " + _this._escapeValue(splitted[0]) + " AND " + _this._escapeValue(splitted[1]);
         };
       })(this));
+      this.registerValueFormatter(/\[(.+,)+.+\]/, (function(_this) {
+        return function(value) {
+          var values;
+          values = value.substring(1, value.length - 1).split(',');
+          return "IN (" + values.map(function(item) {
+            return _this._escapeValue(item);
+          }) + ')';
+        };
+      })(this));
     }
 
     SQLConditionBuilder.prototype.build = function(object) {

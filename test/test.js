@@ -34,10 +34,10 @@ describe('nested content',function(){
 
 describe('value parsers',function(){
     it('should parse basic content',function(){
-        var obj = {less:'<25',lessEq:'<=52',more:'>125',moreEq:'>=521',notEqual:'!ahoj',equal:'svete',like:'li*k?',between:'[10 TO 1000]'};
+        var obj = {less:'<25',lessEq:'<=52',more:'>125',moreEq:'>=521',notEqual:'!ahoj',equal:'svete',like:'li*k?',between:'[10 TO 1000]',in:'[1,2,aa]'};
         var cond = builder.build(obj);
 
-        assert.equal(cond,"less < '25' AND lessEq <= '52' AND more > '125' AND moreEq >= '521' AND notEqual <> 'ahoj' AND equal = 'svete' AND like LIKE 'li%k_' AND between BETWEEN '10' AND '1000'")
+        assert.equal(cond,"less < '25' AND lessEq <= '52' AND more > '125' AND moreEq >= '521' AND notEqual <> 'ahoj' AND equal = 'svete' AND like LIKE 'li%k_' AND between BETWEEN '10' AND '1000' AND in IN ('1','2','aa')")
     })
 })
 

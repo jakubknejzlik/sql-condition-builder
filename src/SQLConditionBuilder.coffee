@@ -27,6 +27,9 @@ class SQLConditionBuilder extends Object
     @registerValueFormatter /\[.+ TO .+\]/,(value)=>
       splitted = value.substring(1,value.length-1).split(' TO ')
       return "BETWEEN " + @_escapeValue(splitted[0]) + " AND " + @_escapeValue(splitted[1])
+    @registerValueFormatter /\[(.+,)+.+\]/,(value)=>
+      values = value.substring(1,value.length - 1).split(',')
+      return "IN (" + values.map((item) => @_escapeValue(item)) + ')'
 
   build:(object)->
     expr = @getExpression(object)
