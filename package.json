@@ -10,12 +10,16 @@
     "convert"
   ],
   "dependencies": {
-    "squel": "~4.4"
+    "squel": "~5.8"
   },
   "scripts": {
-    "test": "mocha test"
+    "test": "mocha --compilers js:babel-core/register test"
   },
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-latest": "^6.24.1",
     "mocha": "^3.2.0"
   },
   "repository": {
