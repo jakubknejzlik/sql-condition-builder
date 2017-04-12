@@ -4,10 +4,10 @@ This module builds SQL conditions from plain javascript objects. Objects are par
 
 This gives the possibility to...
 
-`{a:'Hello',b:'!World'} => "a = 'Hello' AND b != 'World'"` *(?a=Hello&b=!World)*
+\`{a:'Hello',b:'!World'} => "a = 'Hello' AND b != 'World'"` *(?a=Hello&b=!World)*
 
 
-## Instalation
+## Installation
 
 	npm install sql-condition-builder
 
@@ -15,7 +15,7 @@ This gives the possibility to...
 
 	var SQLConditionBuilder = require('sql-condition-builder');
 	var builder = new SQLConditionBuilder();
-	
+
 	var obj = {a:'Hello',b:'!World'}
 	var condition = builder.build(obj); // ->"a = 'Hello' AND b != 'World'"
 
