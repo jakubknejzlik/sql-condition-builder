@@ -1,7 +1,7 @@
 import squel from 'squel';
 
 
-class SQLConditionBuilder  {
+class SQLConditionBuilder {
   constructor() {
     this.valueFormatters = [];
 
@@ -62,9 +62,7 @@ class SQLConditionBuilder  {
   _buildExpressionWithArray(expr, array) {
     return Array.from(array).map((value) =>
       value instanceof Object ?
-        (expr.or_begin(),
-          expr.or(this.build(value)),
-          expr.end())
+        expr.or(this.build(value))
         :
         expr.or(value));
   }

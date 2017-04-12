@@ -28,8 +28,8 @@ describe('nested content', function () {
         var cond = builder.build(obj);
         var cond2 = builder.build(arr);
 
-        assert.equal(cond, '((aa = \'aa\' AND bb = \'bb\') OR (xx = \'yy\' AND yy = \'xx\')) AND test = 125');
-        assert.equal(cond2, '(((aa = \'aa\' AND bb = \'bb\') OR (xx = \'yy\' AND yy = \'xx\'))) OR (test = 125)');
+        assert.equal(cond, '(aa = \'aa\' AND bb = \'bb\' OR xx = \'yy\' AND yy = \'xx\') AND test = 125');
+        assert.equal(cond2, '(aa = \'aa\' AND bb = \'bb\' OR xx = \'yy\' AND yy = \'xx\') OR test = 125');
     })
 })
 
