@@ -1,7 +1,7 @@
 import squel from 'squel';
 
 
-class SQLConditionBuilder {
+export default class SQLConditionBuilder {
   constructor() {
     this.valueFormatters = [];
 
@@ -118,5 +118,3 @@ class SQLConditionBuilder {
     return `'${value}'`;
   }
 }
-
-export default SQLConditionBuilder;
