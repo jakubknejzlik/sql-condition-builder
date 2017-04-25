@@ -36,9 +36,9 @@ export default class SQLConditionBuilder {
       let splitted = value.substring(1, value.length - 1).split(' TO ');
       return `BETWEEN ${this._escapeValue(splitted[0])} AND ${this._escapeValue(splitted[1])}`;
     });
-    this.registerValueFormatter(/\[(.+,)+.+\]/, value => {
+    this.registerValueFormatter(/\[(.+,)*.+\]/, value => {
       let values = value.substring(1, value.length - 1).split(',');
-      return `IN (${values.map(item => this._escapeValue(item))})`;
+      return `IN (${values.map(item => this._escapeValue(item.replace(/^["]+|["]+$/g, "")))})`;
     });
   }
 

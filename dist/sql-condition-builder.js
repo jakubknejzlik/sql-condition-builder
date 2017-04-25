@@ -88,10 +88,10 @@
         var splitted = value.substring(1, value.length - 1).split(' TO ');
         return 'BETWEEN ' + _this._escapeValue(splitted[0]) + ' AND ' + _this._escapeValue(splitted[1]);
       });
-      this.registerValueFormatter(/\[(.+,)+.+\]/, function (value) {
+      this.registerValueFormatter(/\[(.+,)*.+\]/, function (value) {
         var values = value.substring(1, value.length - 1).split(',');
         return 'IN (' + values.map(function (item) {
-          return _this._escapeValue(item);
+          return _this._escapeValue(item.replace(/^["]+|["]+$/g, ""));
         }) + ')';
       });
     }
