@@ -1,0 +1,30 @@
+{
+  "parser": "babel-eslint",
+  "extends": [
+    "eslint:recommended",
+    "plugin:mocha/recommended"
+   ],
+  "plugins": ["mocha"],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true,
+      "classes": true
+    }
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true,
+    "jasmine": true
+  },
+  "rules": {
+    "no-undef": 2,
+    "strict": [2, "global"],
+    "no-underscore-dangle": 0,
+    "eqeqeq": "error",
+    "no-eq-null": "error",
+    "no-loop-func": "error",
+    "no-duplicate-imports": "error"
+  }
+}

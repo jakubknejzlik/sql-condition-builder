@@ -5,13 +5,13 @@ export default class SQLConditionBuilder {
   constructor() {
     this.valueFormatters = [];
 
-    this.registerValueFormatter(null, value => {
+    this.registerValueFormatter(null, value => {  // eslint-disable-line no-unused-vars
       return 'IS NULL';
     });
-    this.registerValueFormatter('null', value => {
+    this.registerValueFormatter('null', value => {  // eslint-disable-line no-unused-vars
       return 'IS NULL';
     });
-    this.registerValueFormatter('!null', value => {
+    this.registerValueFormatter('!null', value => {  // eslint-disable-line no-unused-vars
       return 'IS NOT NULL';
     });
     this.registerValueFormatter('>=', value => {
