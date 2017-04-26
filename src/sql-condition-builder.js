@@ -15,30 +15,42 @@ export default class SQLConditionBuilder {
       return 'IS NOT NULL'
     })
     this.registerValueFormatter('>=', value => {
-      return `>= ${this._escapeValue(value.substring(2))}`
+      return `>= ${this._evalAndEscapeValue(value.substring(2))}`
     })
     this.registerValueFormatter('>', value => {
-      return `> ${this._escapeValue(value.substring(1))}`
+      return `> ${this._evalAndEscapeValue(value.substring(1))}`
     })
     this.registerValueFormatter('<=', value => {
-      return `<= ${this._escapeValue(value.substring(2))}`
+      return `<= ${this._evalAndEscapeValue(value.substring(2))}`
     })
     this.registerValueFormatter('<', value => {
-      return `< ${this._escapeValue(value.substring(1))}`
+      return `< ${this._evalAndEscapeValue(value.substring(1))}`
     })
     this.registerValueFormatter('!', value => {
-      return `<> ${this._escapeValue(value.substring(1))}`
+      return `<> ${this._evalAndEscapeValue(value.substring(1))}`
     })
     this.registerValueFormatter(/[\*\?]+/, value => {
-      return `LIKE ${this._escapeValue(value.replace(/\*/g, '%').replace(/\?/, '_'))}`
+      return `LIKE ${this._evalAndEscapeValue(value.replace(/\*/g, '%').replace(/\?/, '_'))}`
     })
     this.registerValueFormatter(/\[.+ TO .+\]/, value => {
-      const splitted = value.substring(1, value.length - 1).split(' TO ')
-      return `BETWEEN ${this._escapeValue(splitted[0])} AND ${this._escapeValue(splitted[1])}`
+      const splitted = value
+        .substring(1, value.length - 1)
+        .split(' TO ')
+        .map(item => this._evalAndEscapeValue(item))
+
+      const [fromValue, toValue] = splitted
+
+      return `BETWEEN ${fromValue} AND ${toValue}`
     })
     this.registerValueFormatter(/\[(.+,)*.+\]/, value => {
-      const values = value.substring(1, value.length - 1).split(',')
-      return `IN (${values.map(item => this._escapeValue(item.replace(/^["]+|["]+$/g, "")))})`
+      const values = value
+        .substring(1, value.length - 1)
+        .split(',')
+        .map(item => item.trim())
+        .map(item => this._evalAndEscapeValue(item))
+        .join(', ')
+
+      return `IN (${values})`
     })
   }
 
@@ -91,7 +103,6 @@ export default class SQLConditionBuilder {
     })()
   }
 
-
   _parseValue(value) {
     for (const f of Array.from(this.valueFormatters)) {
       if (f.format instanceof RegExp && f.format.test(value)) {
@@ -103,16 +114,34 @@ export default class SQLConditionBuilder {
     return null
   }
 
-
   registerValueFormatter(formatOrPrefix, formatterFunction) {
     return this.valueFormatters.push({ format: formatOrPrefix, fn: formatterFunction })
   }
 
   _escapeValue(value) {
-    return typeof value !== 'string' ?
-      value
-      :
-      this._wrapStringValue(value.replace(/\'/g, '\\\''))
+    if (typeof value !== 'string') {
+      return value
+    }
+
+    return this._wrapStringValue(value.replace(/\'/g, '\\\''))
+  }
+
+  _evalAndEscapeValue(value) {
+    // Return value as is if it's a valid number
+    if (!isNaN(value)) {
+      return value
+    }
+
+    // Strings can be enclosed by double quotes,
+    // parse them for correctness or keep them as is if not correctly wrapper by duoble quotes
+    try {
+      value = JSON.parse(value)
+    } catch (e) {
+      // eslint disable-line no-empty
+    }
+
+    // Return string encoded and wrapped in single quotes
+    return this._escapeValue(value)
   }
 
   _wrapStringValue(value) {

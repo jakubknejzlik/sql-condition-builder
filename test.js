@@ -34,26 +34,70 @@ describe("nested content", () => {
 })
 
 describe("value parsers", () => {
-  it("should parse basic content", () => {
-    const obj = {
-      less: "<25",
-      lessEq: "<=52",
-      more: ">125",
-      moreEq: ">=521",
-      notEqual: "!ahoj",
-      equal: "svete",
-      like: "li*k?",
-      between: "[10 TO 1000]",
-      in: "[1,2,aa]",
-      in2: "[aa]",
-      in3: '["aa","bb"]'
-    }
+  it("should parse in", () => {
+    const obj = { inNumber: '[1, 2]', inString: '[a, b]', inQuoted: '["1", "2"]' }
+    const cond = builder.build(obj)
+
+    assert.equal(cond, "inNumber IN (1, 2) AND inString IN ('a', 'b') AND inQuoted IN ('1', '2')")
+  })
+
+  it("should parse between", () => {
+    const obj = { btNumber: '[10 TO 1000]', btString: '[a TO z]', btQuoted: '["1" TO "10"]' }
     const cond = builder.build(obj)
 
     assert.equal(
       cond,
-      "less < '25' AND lessEq <= '52' AND more > '125' AND moreEq >= '521' AND notEqual <> 'ahoj' AND equal = 'svete' AND like LIKE 'li%k_' AND between BETWEEN '10' AND '1000' AND in IN ('1','2','aa') AND in2 IN ('aa') AND in3 IN ('aa','bb')"
+      "btNumber BETWEEN 10 AND 1000 AND btString BETWEEN 'a' AND 'z' AND btQuoted BETWEEN '1' AND '10'"
     )
+  })
+
+  it("should parse like", () => {
+    const obj = { like: 'li*k?' }
+    const cond = builder.build(obj)
+
+    assert.equal(cond, "like LIKE 'li%k_'")
+  })
+
+  it("should parse not equal", () => {
+    const obj = { neNumber: '!25', neString: '!aa', neQuoted: '!"25"' }
+    const cond = builder.build(obj)
+
+    assert.equal(cond, "neNumber <> 25 AND neString <> 'aa' AND neQuoted <> '25'")
+  })
+
+  it("should parse equal", () => {
+    const obj = { eqNumber: 25, eqStrNumber: '25', eqString: 'aa' }
+    const cond = builder.build(obj)
+
+    assert.equal(cond, "eqNumber = 25 AND eqStrNumber = '25' AND eqString = 'aa'")
+  })
+
+  it("should parse greater or equal than", () => {
+    const obj = { geNumber: '>=25', geString: '>=aa', geQuoted: '>="25"' }
+    const cond = builder.build(obj)
+
+    assert.equal(cond, "geNumber >= 25 AND geString >= 'aa' AND geQuoted >= '25'")
+  })
+
+  it("should parse greater than", () => {
+    const obj = { gtNumber: '>25', gtString: '>aa', gtQuoted: '>"25"' }
+    const cond = builder.build(obj)
+
+    assert.equal(cond, "gtNumber > 25 AND gtString > 'aa' AND gtQuoted > '25'")
+  })
+
+  it("should parse less or equal than", () => {
+    const obj = { leNumber: '<=25', leString: '<=aa', leQuoted: '<="25"' }
+    const cond = builder.build(obj)
+
+    assert.equal(cond, "leNumber <= 25 AND leString <= 'aa' AND leQuoted <= '25'")
+  })
+
+  it("should parse less than", () => {
+    const obj = { ltNumber: '<25', ltString: '<aa', ltQuoted: '<"25"' }
+    const cond = builder.build(obj)
+
+    assert.equal(cond, "ltNumber < 25 AND ltString < 'aa' AND ltQuoted < '25'")
   })
 })
 
