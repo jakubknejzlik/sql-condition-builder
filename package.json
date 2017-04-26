@@ -10,14 +10,21 @@
     "convert"
   ],
   "dependencies": {
-    "squel": "~4.4"
+    "squel": "~5.9"
   },
   "scripts": {
-    "test": "mocha test"
+    "test": "mocha --compilers js:babel-core/register test",
+    "build": "babel ./src -d ./dist"
   },
   "devDependencies": {
-    "mocha": "^3.2.0"
+    "babel-cli": "~6.24.1",
+    "babel-core": "~6.24.1",
+    "babel-plugin-add-module-exports": "~0.2.1",
+    "babel-plugin-transform-es2015-modules-umd": "~6.24.1",
+    "babel-preset-latest": "~6.24.1",
+    "mocha": "~3.3.0"
   },
+  "main": "dist/sql-condition-builder.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/jakubknejzlik/sql-condition-builder.git"
