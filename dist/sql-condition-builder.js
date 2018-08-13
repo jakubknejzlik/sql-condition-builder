@@ -25,6 +25,44 @@
     };
   }
 
+  var _slicedToArray = function () {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+
+      try {
+        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+
+          if (i && _arr.length === i) break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"]) _i["return"]();
+        } finally {
+          if (_d) throw _e;
+        }
+      }
+
+      return _arr;
+    }
+
+    return function (arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -58,54 +96,67 @@
       this.valueFormatters = [];
 
       this.registerValueFormatter(null, function (value) {
+        // eslint-disable-line no-unused-vars
         return 'IS NULL';
       });
       this.registerValueFormatter('null', function (value) {
+        // eslint-disable-line no-unused-vars
         return 'IS NULL';
       });
       this.registerValueFormatter('!null', function (value) {
+        // eslint-disable-line no-unused-vars
         return 'IS NOT NULL';
       });
       this.registerValueFormatter('>=', function (value) {
-        return '>= ' + _this._escapeValue(value.substring(2));
+        return '>= ' + _this._evalAndEscapeValue(value.substring(2));
       });
       this.registerValueFormatter('>', function (value) {
-        return '> ' + _this._escapeValue(value.substring(1));
+        return '> ' + _this._evalAndEscapeValue(value.substring(1));
       });
       this.registerValueFormatter('<=', function (value) {
-        return '<= ' + _this._escapeValue(value.substring(2));
+        return '<= ' + _this._evalAndEscapeValue(value.substring(2));
       });
       this.registerValueFormatter('<', function (value) {
-        return '< ' + _this._escapeValue(value.substring(1));
+        return '< ' + _this._evalAndEscapeValue(value.substring(1));
       });
       this.registerValueFormatter('!', function (value) {
-        return '<> ' + _this._escapeValue(value.substring(1));
+        return '<> ' + _this._evalAndEscapeValue(value.substring(1));
       });
       this.registerValueFormatter(/[\*\?]+/, function (value) {
-        return 'LIKE ' + _this._escapeValue(value.replace(/\*/g, '%').replace(/\?/, '_'));
+        return 'LIKE ' + _this._evalAndEscapeValue(value.replace(/\*/g, '%').replace(/\?/, '_'));
       });
       this.registerValueFormatter(/\[.+ TO .+\]/, function (value) {
-        var splitted = value.substring(1, value.length - 1).split(' TO ');
-        return 'BETWEEN ' + _this._escapeValue(splitted[0]) + ' AND ' + _this._escapeValue(splitted[1]);
+        var splitted = value.substring(1, value.length - 1).split(' TO ').map(function (item) {
+          return _this._evalAndEscapeValue(item);
+        });
+
+        var _splitted = _slicedToArray(splitted, 2),
+            fromValue = _splitted[0],
+            toValue = _splitted[1];
+
+        return 'BETWEEN ' + fromValue + ' AND ' + toValue;
       });
       this.registerValueFormatter(/\[(.+,)*.+\]/, function (value) {
-        var values = value.substring(1, value.length - 1).split(',');
-        return 'IN (' + values.map(function (item) {
-          return _this._escapeValue(item.replace(/^["]+|["]+$/g, ""));
-        }) + ')';
+        var values = value.substring(1, value.length - 1).split(',').map(function (item) {
+          return item.trim();
+        }).map(function (item) {
+          return _this._evalAndEscapeValue(item);
+        }).join(', ');
+
+        return 'IN (' + values + ')';
       });
     }
 
     _createClass(SQLConditionBuilder, [{
       key: 'build',
       value: function build(object) {
-        var expr = this.getExpression(object);
-        return expr.toString();
+        return this.getExpression(object).toString();
       }
     }, {
       key: 'getExpression',
       value: function getExpression(objectOrArray) {
         var expr = _squel2.default.expr();
+
         if (Array.isArray(objectOrArray)) {
           this._buildExpressionWithArray(expr, objectOrArray);
         } else {
@@ -130,12 +181,15 @@
 
         return function () {
           var result = [];
+
           for (var key in object) {
             var value = object[key];
+
             if (value instanceof Object) {
               result.push(expr.and('(' + _this3.build(value) + ')'));
             } else {
               var parsedValue = _this3._parseValue(value);
+
               if (parsedValue) {
                 result.push(expr.and(key + ' ' + parsedValue));
               } else {
@@ -143,6 +197,7 @@
               }
             }
           }
+
           return result;
         }();
       }
@@ -191,15 +246,32 @@
         if (typeof value !== 'string') {
           return value;
         }
+
         return this._wrapStringValue(value.replace(/\'/g, '\\\''));
+      }
+    }, {
+      key: '_evalAndEscapeValue',
+      value: function _evalAndEscapeValue(value) {
+        // Return value as is if it's a valid number
+        if (!isNaN(value)) {
+          return value;
+        }
+
+        // Strings can be enclosed by double quotes,
+        // parse them for correctness or keep them as is if not correctly wrapper by duoble quotes
+        try {
+          value = JSON.parse(value);
+        } catch (e) {}
+        // eslint disable-line no-empty
+
+
+        // Return string encoded and wrapped in single quotes
+        return this._escapeValue(value);
       }
     }, {
       key: '_wrapStringValue',
       value: function _wrapStringValue(value) {
-        if (value[0] === '`') {
-          return value;
-        }
-        return '\'' + value + '\'';
+        return value[0] === '`' ? value : '\'' + value + '\'';
       }
     }]);
 
