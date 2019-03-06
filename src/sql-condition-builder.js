@@ -32,7 +32,7 @@ export default class SQLConditionBuilder {
     this.registerValueFormatter(/[\*\?]+/, value => {
       return `LIKE ${this._evalAndEscapeValue(value.replace(/\*/g, '%').replace(/\?/, '_'))}`
     })
-    this.registerValueFormatter(/\[.+ TO .+\]/, value => {
+    this.registerValueFormatter(/^\[.+ TO .+\]$/, value => {
       const splitted = value
         .substring(1, value.length - 1)
         .split(' TO ')
@@ -42,7 +42,7 @@ export default class SQLConditionBuilder {
 
       return `BETWEEN ${fromValue} AND ${toValue}`
     })
-    this.registerValueFormatter(/\[(.+,)*.+\]/, value => {
+    this.registerValueFormatter(/^\[(.+,)*.+\]$/, value => {
       const values = value
         .substring(1, value.length - 1)
         .split(',')

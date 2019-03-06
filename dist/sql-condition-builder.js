@@ -125,7 +125,7 @@
       this.registerValueFormatter(/[\*\?]+/, function (value) {
         return 'LIKE ' + _this._evalAndEscapeValue(value.replace(/\*/g, '%').replace(/\?/, '_'));
       });
-      this.registerValueFormatter(/\[.+ TO .+\]/, function (value) {
+      this.registerValueFormatter(/^\[.+ TO .+\]$/, function (value) {
         var splitted = value.substring(1, value.length - 1).split(' TO ').map(function (item) {
           return _this._evalAndEscapeValue(item);
         });
@@ -136,7 +136,7 @@
 
         return 'BETWEEN ' + fromValue + ' AND ' + toValue;
       });
-      this.registerValueFormatter(/\[(.+,)*.+\]/, function (value) {
+      this.registerValueFormatter(/^\[(.+,)*.+\]$/, function (value) {
         var values = value.substring(1, value.length - 1).split(',').map(function (item) {
           return item.trim();
         }).map(function (item) {

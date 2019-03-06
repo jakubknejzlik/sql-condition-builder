@@ -40,6 +40,12 @@ describe("value parsers", () => {
 
     assert.equal(cond, "inNumber IN (1, 2) AND inString IN ('a', 'b') AND inQuoted IN ('1', '2')")
   })
+  it("should not parse in for text brackets", () => {
+    const obj = { inString: "[a, b]", notInString: "prefix [text] sufix" };
+    const cond = builder.build(obj);
+
+    assert.equal(cond, "inString IN ('a', 'b') AND notInString = 'prefix [text] sufix'");
+  });
 
   it("should parse between", () => {
     const obj = { btNumber: '[10 TO 1000]', btString: '[a TO z]', btQuoted: '["1" TO "10"]' }
