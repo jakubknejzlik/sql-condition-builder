@@ -1,8 +1,8 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'squel'], factory);
+    define(["module", "exports", "squel"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('squel'));
+    factory(module, exports, require("squel"));
   } else {
     var mod = {
       exports: {}
@@ -11,7 +11,7 @@
     global.sqlConditionBuilder = mod.exports;
   }
 })(this, function (module, exports, _squel) {
-  'use strict';
+  "use strict";
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -97,36 +97,36 @@
 
       this.registerValueFormatter(null, function (value) {
         // eslint-disable-line no-unused-vars
-        return 'IS NULL';
+        return "IS NULL";
       });
-      this.registerValueFormatter('null', function (value) {
+      this.registerValueFormatter("null", function (value) {
         // eslint-disable-line no-unused-vars
-        return 'IS NULL';
+        return "IS NULL";
       });
-      this.registerValueFormatter('!null', function (value) {
+      this.registerValueFormatter("!null", function (value) {
         // eslint-disable-line no-unused-vars
-        return 'IS NOT NULL';
+        return "IS NOT NULL";
       });
-      this.registerValueFormatter('>=', function (value) {
-        return '>= ' + _this._evalAndEscapeValue(value.substring(2));
+      this.registerValueFormatter(">=", function (value) {
+        return ">= " + _this._evalAndEscapeValue(value.substring(2));
       });
-      this.registerValueFormatter('>', function (value) {
-        return '> ' + _this._evalAndEscapeValue(value.substring(1));
+      this.registerValueFormatter(">", function (value) {
+        return "> " + _this._evalAndEscapeValue(value.substring(1));
       });
-      this.registerValueFormatter('<=', function (value) {
-        return '<= ' + _this._evalAndEscapeValue(value.substring(2));
+      this.registerValueFormatter("<=", function (value) {
+        return "<= " + _this._evalAndEscapeValue(value.substring(2));
       });
-      this.registerValueFormatter('<', function (value) {
-        return '< ' + _this._evalAndEscapeValue(value.substring(1));
+      this.registerValueFormatter("<", function (value) {
+        return "< " + _this._evalAndEscapeValue(value.substring(1));
       });
-      this.registerValueFormatter('!', function (value) {
-        return '<> ' + _this._evalAndEscapeValue(value.substring(1));
+      this.registerValueFormatter("!", function (value) {
+        return "<> " + _this._evalAndEscapeValue(value.substring(1));
       });
       this.registerValueFormatter(/[\*\?]+/, function (value) {
-        return 'LIKE ' + _this._evalAndEscapeValue(value.replace(/\*/g, '%').replace(/\?/, '_'));
+        return "LIKE " + _this._evalAndEscapeValue(value.replace(/\*/g, "%").replace(/\?/, "_"));
       });
       this.registerValueFormatter(/^\[.+ TO .+\]$/, function (value) {
-        var splitted = value.substring(1, value.length - 1).split(' TO ').map(function (item) {
+        var splitted = value.substring(1, value.length - 1).split(" TO ").map(function (item) {
           return _this._evalAndEscapeValue(item);
         });
 
@@ -134,26 +134,29 @@
             fromValue = _splitted[0],
             toValue = _splitted[1];
 
-        return 'BETWEEN ' + fromValue + ' AND ' + toValue;
+        return "BETWEEN " + fromValue + " AND " + toValue;
+      });
+      this.registerValueFormatter("[]", function (value) {
+        return undefined;
       });
       this.registerValueFormatter(/^\[(.+,)*.+\]$/, function (value) {
-        var values = value.substring(1, value.length - 1).split(',').map(function (item) {
+        var values = value.substring(1, value.length - 1).split(",").map(function (item) {
           return item.trim();
         }).map(function (item) {
           return _this._evalAndEscapeValue(item);
-        }).join(', ');
+        }).join(", ");
 
-        return 'IN (' + values + ')';
+        return "IN (" + values + ")";
       });
     }
 
     _createClass(SQLConditionBuilder, [{
-      key: 'build',
+      key: "build",
       value: function build(object) {
         return this.getExpression(object).toString();
       }
     }, {
-      key: 'getExpression',
+      key: "getExpression",
       value: function getExpression(objectOrArray) {
         var expr = _squel2.default.expr();
 
@@ -166,7 +169,7 @@
         return expr;
       }
     }, {
-      key: '_buildExpressionWithArray',
+      key: "_buildExpressionWithArray",
       value: function _buildExpressionWithArray(expr, array) {
         var _this2 = this;
 
@@ -175,7 +178,7 @@
         });
       }
     }, {
-      key: '_buildExpressionWithObject',
+      key: "_buildExpressionWithObject",
       value: function _buildExpressionWithObject(expr, object) {
         var _this3 = this;
 
@@ -186,14 +189,16 @@
             var value = object[key];
 
             if (value instanceof Object) {
-              result.push(expr.and('(' + _this3.build(value) + ')'));
+              result.push(expr.and("(" + _this3.build(value) + ")"));
             } else {
               var parsedValue = _this3._parseValue(value);
 
-              if (parsedValue) {
-                result.push(expr.and(key + ' ' + parsedValue));
-              } else {
-                result.push(expr.and(key + ' = ' + _this3._escapeValue(value)));
+              if (typeof parsedValue !== "undefined") {
+                if (parsedValue) {
+                  result.push(expr.and(key + " " + parsedValue));
+                } else {
+                  result.push(expr.and(key + " = " + _this3._escapeValue(value)));
+                }
               }
             }
           }
@@ -202,7 +207,7 @@
         }();
       }
     }, {
-      key: '_parseValue',
+      key: "_parseValue",
       value: function _parseValue(value) {
         var _iteratorNormalCompletion = true;
         var _didIteratorError = false;
@@ -214,7 +219,7 @@
 
             if (f.format instanceof RegExp && f.format.test(value)) {
               return f.fn(value);
-            } else if (value === f.format || value && (typeof value.indexOf === 'function' ? value.indexOf(f.format) : undefined) === 0) {
+            } else if (value === f.format || value && (typeof value.indexOf === "function" ? value.indexOf(f.format) : undefined) === 0) {
               return f.fn(value);
             }
           }
@@ -236,21 +241,27 @@
         return null;
       }
     }, {
-      key: 'registerValueFormatter',
+      key: "registerValueFormatter",
       value: function registerValueFormatter(formatOrPrefix, formatterFunction) {
-        return this.valueFormatters.push({ format: formatOrPrefix, fn: formatterFunction });
+        return this.valueFormatters.push({
+          format: formatOrPrefix,
+          fn: formatterFunction
+        });
       }
     }, {
-      key: '_escapeValue',
+      key: "_escapeValue",
       value: function _escapeValue(value) {
-        if (typeof value !== 'string') {
+        if (typeof value !== "string") {
           return value;
         }
 
-        return this._wrapStringValue(value.replace(/\'/g, '\\\''));
+        if (value[0] === "'" && value[value.length - 1] === "'" || value[0] === "\"" && value[value.length - 1] === "\"") {
+          value = value.substring(1, value.length - 1);
+        }
+        return this._wrapStringValue(value.replace(/\'/g, "\\'"));
       }
     }, {
-      key: '_evalAndEscapeValue',
+      key: "_evalAndEscapeValue",
       value: function _evalAndEscapeValue(value) {
         // Return value as is if it's a valid number
         if (!isNaN(value)) {
@@ -269,9 +280,9 @@
         return this._escapeValue(value);
       }
     }, {
-      key: '_wrapStringValue',
+      key: "_wrapStringValue",
       value: function _wrapStringValue(value) {
-        return value[0] === '`' ? value : '\'' + value + '\'';
+        return value[0] === "`" ? value : "'" + value + "'";
       }
     }]);
 
@@ -279,5 +290,5 @@
   }();
 
   exports.default = SQLConditionBuilder;
-  module.exports = exports['default'];
+  module.exports = exports["default"];
 });
