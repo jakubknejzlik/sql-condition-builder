@@ -89,6 +89,12 @@ describe("value parsers", () => {
 
     assert.equal(cond, "inString IN ('a', 'b')");
   });
+  it("should ignore empty brackets", () => {
+    const obj = { inString: `[]`, btNumber: "sss" };
+    const cond = builder.build(obj);
+
+    assert.equal(cond, "btNumber = 'sss'");
+  });
 
   it("should parse between", () => {
     const obj = {

@@ -46,6 +46,9 @@ export default class SQLConditionBuilder {
 
       return `BETWEEN ${fromValue} AND ${toValue}`;
     });
+    this.registerValueFormatter("[]", (value) => {
+      return undefined;
+    });
     this.registerValueFormatter(/^\[(.+,)*.+\]$/, (value) => {
       const values = value
         .substring(1, value.length - 1)
@@ -92,10 +95,12 @@ export default class SQLConditionBuilder {
         } else {
           const parsedValue = this._parseValue(value);
 
-          if (parsedValue) {
-            result.push(expr.and(`${key} ${parsedValue}`));
-          } else {
-            result.push(expr.and(`${key} = ${this._escapeValue(value)}`));
+          if (typeof parsedValue !== "undefined") {
+            if (parsedValue) {
+              result.push(expr.and(`${key} ${parsedValue}`));
+            } else {
+              result.push(expr.and(`${key} = ${this._escapeValue(value)}`));
+            }
           }
         }
       }
