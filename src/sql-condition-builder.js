@@ -28,6 +28,19 @@ export default class SQLConditionBuilder {
     this.registerValueFormatter("<", (value) => {
       return `< ${this._evalAndEscapeValue(value.substring(1))}`;
     });
+    this.registerValueFormatter("![]", (value) => {
+      return undefined;
+    });
+    this.registerValueFormatter(/^\!\[(.+,)*.+\]$/, (value) => {
+      const values = value
+        .substring(2, value.length - 1)
+        .split(",")
+        .map((item) => item.trim())
+        .map((item) => this._evalAndEscapeValue(item))
+        .join(", ");
+
+      return `NOT IN (${values})`;
+    });
     this.registerValueFormatter("!", (value) => {
       return `<> ${this._evalAndEscapeValue(value.substring(1))}`;
     });

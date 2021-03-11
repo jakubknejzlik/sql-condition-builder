@@ -89,8 +89,20 @@ describe("value parsers", () => {
 
     assert.equal(cond, "inString IN ('a', 'b')");
   });
+  it("should parse not in with brackets", () => {
+    const obj = { notIn: `!["a", b, 'c']` };
+    const cond = builder.build(obj);
+
+    assert.equal(cond, "notIn NOT IN ('a', 'b', 'c')");
+  });
   it("should ignore empty brackets", () => {
     const obj = { inString: `[]`, btNumber: "sss" };
+    const cond = builder.build(obj);
+
+    assert.equal(cond, "btNumber = 'sss'");
+  });
+  it("should ignore empty brackets with exclamation mark", () => {
+    const obj = { inString: `![]`, btNumber: "sss" };
     const cond = builder.build(obj);
 
     assert.equal(cond, "btNumber = 'sss'");

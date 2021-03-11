@@ -119,6 +119,18 @@
       this.registerValueFormatter("<", function (value) {
         return "< " + _this._evalAndEscapeValue(value.substring(1));
       });
+      this.registerValueFormatter("![]", function (value) {
+        return undefined;
+      });
+      this.registerValueFormatter(/^\!\[(.+,)*.+\]$/, function (value) {
+        var values = value.substring(2, value.length - 1).split(",").map(function (item) {
+          return item.trim();
+        }).map(function (item) {
+          return _this._evalAndEscapeValue(item);
+        }).join(", ");
+
+        return "NOT IN (" + values + ")";
+      });
       this.registerValueFormatter("!", function (value) {
         return "<> " + _this._evalAndEscapeValue(value.substring(1));
       });
